@@ -12,7 +12,7 @@ connectDB();
 
 app.use(cors(corsOptions));
 app.use('/ad', require('./routes/advertisingRoutes'))
-app.use('/balance', require('./routes/balaceRoutes'))
+app.use('/balance', require('./routes/balanceRoutes'))
 app.use(express.json());
 
 mongoose.connection.once('open', () => {
