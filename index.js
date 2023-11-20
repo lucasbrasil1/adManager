@@ -11,9 +11,9 @@ const PORT = process.env.PORT || 3500;
 connectDB();
 
 app.use(cors(corsOptions));
-app.use('/ad', require('./routes/advertisingRoutes'))
-app.use('/balance', require('./routes/balanceRoutes'))
 app.use(express.json());
+
+app.use('/ad', require('./routes/advertisingRoutes'))
 
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB');

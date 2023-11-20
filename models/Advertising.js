@@ -9,11 +9,22 @@ const advertisingSchema = mongoose.Schema({
         type: String,
         required : true
     },
-    balance: [{
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'Balance'
-    }],
+    amount : {
+        type: Number,
+        required : true
+    },
+    bannerClicks : {
+        type: Number
+    },
+    bannerViews : {
+        type: Number
+    },
+    interstitialClicks : {
+        type: Number
+    },
+    interstitialViews : {
+        type: Number
+    }
 })
 
 module.exports = mongoose.model('Advertising', advertisingSchema)
