@@ -6,9 +6,7 @@ router.route('/')
     //route get all advertisings
     .get(advertisingController.getAllAdvertising)
     //route create advertising
-    .post(advertisingController.createAdvertising)
-    //route delete advertising
-    .delete(advertisingController.deleteById);
+    .post(advertisingController.createAdvertising);
 
 
 router.route('/:id')

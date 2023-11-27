@@ -1,12 +1,13 @@
-const Advertising = require('../models/Advertising');
+const { add, get, getOne } = require("../config/dados");
 
+let dados = [];
 // @desc Get all advertising
 // @route GET /ad
 // @access Public
 const getAllAdvertising = async (req, res) => {
-    const ads = await Advertising.find().lean().exec();
+    // const ads = await Advertising.find().lean().exec();
 
-    return res.json(ads);
+    return res.json(get());
 }
 
 // @desc Get one advertising
@@ -15,7 +16,7 @@ const getAllAdvertising = async (req, res) => {
 const getById = async (req, res) => {
     const { id } = req.params;
 
-    const ad = await Advertising.findById(id).lean().exec();
+    const ad = getOne(id);
 
     if (!ad) {
         return res.status(400).json({ message: 'Nenhuma campanha encontrada' });
@@ -30,19 +31,13 @@ const getById = async (req, res) => {
 const createAdvertising = async (req, res) => {
     const { name, description, amount } = req.body;
 
+
     if (!name || !description) {
         return res.status(400).json({ message: "Nome e descrição não podem ser nulos." });
     }
 
-    const duplicate = await Advertising.findOne({ name }).collation({
-        locale: 'pt', strength: 2
-    }).lean().exec();
-
-    if (duplicate) {
-        return res.status(409).json({ message: 'Já existe uma campanha com esse nome.' });
-    }
-
     const newAd = {
+        id : dados.length,
         name,
         description,
         amount: amount || 0,
@@ -52,10 +47,10 @@ const createAdvertising = async (req, res) => {
         interstitialViews: 0
     };
 
-    const ad = await Advertising.create(newAd);
+    const ad = add(newAd)
 
     if (ad) { //created
-        res.status(201).json({ message: `Nova campanha ${name} criada`, ad })
+        res.status(201).json({ message: `Nova campanha ${name} criada` })
     } else {
         res.status(401).json({ message: 'Dados inválidos' })
     }
@@ -72,9 +67,7 @@ const addAmount = async (req, res) => {
         res.status(400).json({ message: 'Dados inválidos' });
     }
 
-    const ad = await Advertising.findById(id).collation({
-        locale: 'pt', strength: 2
-    }).exec();
+    const ad = getOne(id);
 
     if (!ad) {
         return res.status(400).json({ message: 'Campanha não encontrada' });
@@ -83,8 +76,7 @@ const addAmount = async (req, res) => {
     const finalAmount = ad.amount + amount;
     ad.amount = finalAmount;
 
-    const updatedValue = await ad.save();
-    res.json({ message: `${updatedValue.name} atualizado para valor: ${updatedValue.amount}` })
+    res.json({ message: `${ad.name} atualizado para valor: ${ad.amount}` })
 }
 
 // @desc Consume advertising
@@ -98,9 +90,7 @@ const consume = async (req, res) => {
         res.status(400).json({ message: 'Dados inválidos' });
     }
 
-    const ad = await Advertising.findById(id).collation({
-        locale: 'pt', strength: 2
-    }).exec();
+    const ad = getOne(id);
 
     if (!ad) {
         return res.status(400).json({ message: 'Campanha não encontrada' });
@@ -129,37 +119,16 @@ const consume = async (req, res) => {
     }
 
     ad.amount = updatedAmount;
-    const updatedAd = await ad.save();
+    // const updatedAd = await ad.save();
 
-    return res.json({ message: `${updatedAd.name} consumida, valor restante : ${ad.amount}` })
+    return res.json({ message: `${ad.name} consumida, valor restante : ${ad.amount}` })
 }
 
-
-// @desc Consume advertising
-// @route DELETE /ad
-// @access Public
-const deleteById = async (req, res) => {
-    const { id } = req.body;
-
-    if (!id) {
-        return res.status(400).json({ message: 'Id obrigatório' });
-    }
-
-    const ad = await Advertising.findById(id).exec();
-
-    if (!ad) {
-        return res.status(400).json({ message: 'Campanha não encontrada' });
-    }
-
-    await ad.deleteOne();
-    res.json({ message: `Campanha excluída` });
-}
 
 module.exports = {
     getAllAdvertising,
     createAdvertising,
     addAmount,
     consume,
-    deleteById,
     getById
 }
